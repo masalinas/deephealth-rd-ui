@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+  web:
+    image: "thingtrack/site:edikal-0.0.1"
+    ports:
+      - "80"
+    networks:
+      - thingtrack-net
+    labels:
+      - "traefik.backend=edikal-site"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:edikal.com, www.edikal.com, edikal-site.nodesensor.com"
+      - "traefik.enable=true"
+      - "traefik.protocol=http"
+      - "traefik.docker.network=traefik-net"
+    deploy:
+      mode: replicated
+      replicas: 1
+    secrets:
+      - source: edikal_env
+        target: /usr/src/app/.env
+        uid: '103'
+        gid: '103'
+        mode: 0440
+networks:
+  thingtrack-net:
+     external:
+       name: traefik-net      
+   
+secrets:
+  edikal_env:
+    external: true
